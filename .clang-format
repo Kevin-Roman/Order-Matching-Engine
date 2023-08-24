@@ -1,0 +1,9 @@
+Language: Cpp
+BasedOnStyle: Google
+AlignAfterOpenBracket: AlwaysBreak
+AllowShortBlocksOnASingleLine: false
+AllowShortFunctionsOnASingleLine: false
+BinPackArguments: false
+BinPackParameters: false
+ColumnLimit: 100
+SortIncludes: false

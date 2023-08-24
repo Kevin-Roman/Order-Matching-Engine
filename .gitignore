@@ -33,3 +33,8 @@
 
 # build
 /build
+/out
+
+# vscode
+.vscode
+.vs
