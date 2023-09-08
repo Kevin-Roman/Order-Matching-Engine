@@ -19,52 +19,44 @@ struct PointerEquality {
 
 OrderBook::OrderBook(){};
 
-size_t OrderBook::bidSize() const {
-  return m_bids.size();
-};
-
-size_t OrderBook::askSize() const {
-  return m_asks.size();
-};
-
 void OrderBook::add(std::unique_ptr<Order> order) {
-  if (order->getDirection() == "buy") {
-    // TODO: make sure that order also takes into account the time when the order was added
+  if (order->side() == "buy") {
     m_bids.insert(std::move(order));
-  } else if (order->getDirection() == "sell") {
+  } else if (order->side() == "sell") {
     m_asks.insert(std::move(order));
   }
 };
 
 void OrderBook::remove(Order *order) {
-  if (order->getDirection() == "buy") {
+  if (order->side() == "buy") {
     m_bids.erase(std::find_if(m_bids.begin(), m_bids.end(), PointerEquality(order)));
-  } else if (order->getDirection() == "sell") {
-    m_asks.erase(std::find_if(m_bids.begin(), m_bids.end(), PointerEquality(order)));
+  } else if (order->side() == "sell") {
+    m_asks.erase(std::find_if(m_asks.begin(), m_asks.end(), PointerEquality(order)));
   }
 };
 
-// What's the point of the 2nd const?
-const std::multiset<std::unique_ptr<Order>, DecreasingPriceComparator> &OrderBook::getBids() const {
+const std::multiset<std::unique_ptr<Order>, DecreasingPriceComparator> &OrderBook::bids() const {
   return m_bids;
 };
 
-const std::multiset<std::unique_ptr<Order>, IncreasingPriceComparator> &OrderBook::getAsks() const {
+const std::multiset<std::unique_ptr<Order>, IncreasingPriceComparator> &OrderBook::asks() const {
   return m_asks;
 };
 
-double OrderBook::bestBid() {
+double OrderBook::bestBid() const {
   if (!m_bids.empty()) {
-    return (*m_bids.begin())->getPrice();
+    return (*m_bids.begin())->price();
   }
 
+  // return 'infinite' if no bid orders exist.
   return std::numeric_limits<int>::max();
 };
 
-double OrderBook::bestAsk() {
+double OrderBook::bestAsk() const {
   if (!m_bids.empty()) {
-    return (*m_bids.begin())->getPrice();
+    return (*m_bids.begin())->price();
   }
 
+  // return '-infinite' if no ask orders exist.
   return std::numeric_limits<int>::min();
 };

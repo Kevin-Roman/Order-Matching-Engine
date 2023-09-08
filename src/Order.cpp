@@ -1,26 +1,31 @@
 #include "Order.h"
+#include "OrderData.h"
 
+#include <ctime>
 #include <string>
 
-Order::Order(
-    const std::string orderType,
-    const std::string direction,
-    const double price,
-    const int quantity)
-    : m_orderType(orderType), m_direction(direction), m_price(price), m_quantity(quantity){};
+Order::Order(OrderData orderData) : m_orderData(orderData){};
 
-std::string Order::getDirection() const {
-  return m_direction;
+int Order::id() const {
+  return m_orderData.orderId;
 };
 
-double Order::getPrice() const {
-  return m_price;
+std::string Order::side() const {
+  return m_orderData.side;
 };
 
-int Order::getQuantity() const {
-  return m_quantity;
+double Order::price() const {
+  return m_orderData.price;
 };
 
-void Order::subtractQuantity(int quantity) {
-  m_quantity -= quantity;
+int Order::volume() const {
+  return m_orderData.volume;
+};
+
+std::time_t Order::time() const {
+  return m_orderData.time;
+}
+
+void Order::subtractVolume(int volume) {
+  m_orderData.volume -= volume;
 };

@@ -1,3 +1,3 @@
 #include "Trade.h"
 
-Trade::Trade(const double price, const int quantity) : m_price(price), m_quantity(quantity){};
+Trade::Trade(double price, int volume) : m_price(price), m_volume(volume){};

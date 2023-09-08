@@ -2,6 +2,7 @@
 
 #include "OrderBook.h"
 
+/// @brief Base class for ouputting the orderbook.
 class IOutput {
  public:
   IOutput(const OrderBook& orderBook);

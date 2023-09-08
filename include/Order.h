@@ -1,24 +1,32 @@
 #pragma once
 
+#include "OrderData.h"
+
+#include <ctime>
 #include <string>
 
+/// @brief Class representing an order.
 class Order {
  public:
-  // TODO: use string reference
-  Order(
-      const std::string orderType,
-      const std::string direction,
-      const double price,
-      const int quantity);
+  Order(OrderData orderData);
 
-  std::string getDirection() const;
-  double getPrice() const;
-  int getQuantity() const;
-  void subtractQuantity(int quantity);
+  void subtractVolume(int volume);
+
+  /// @return The id of the Order.
+  int id() const;
+
+  /// @return The side of the Order.
+  std::string side() const;
+
+  /// @return The price of the Order.
+  double price() const;
+
+  /// @return The volume of the Order.
+  int volume() const;
+
+  /// @return The time the Order was received.
+  std::time_t time() const;
 
  private:
-  const std::string m_orderType;
-  const std::string m_direction;
-  const double m_price;
-  int m_quantity;
+  OrderData m_orderData;
 };

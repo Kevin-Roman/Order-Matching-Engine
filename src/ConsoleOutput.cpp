@@ -1,5 +1,6 @@
 #include "IOutput.h"
 #include "ConsoleOutput.h"
+#include "OrderBook.h"
 
 #include <iostream>
 #include <algorithm>
@@ -8,41 +9,62 @@
 ConsoleOutput::ConsoleOutput(const OrderBook& orderBook) : IOutput(orderBook){};
 
 void ConsoleOutput::displayOrderBook() const {
-  system("cls");
+  while (true) {
+    // Clear the terminal.
+    system("cls");
 
-  std::cout << std::fixed << std::setprecision(2);
+    // Set precision of price double values (the price) to 2 decimal points.
+    std::cout << std::fixed << std::setprecision(2);
 
-  std::cout << "         BIDS             ASKS" << std::endl;
-  std::cout << " QUANTITY    PRICE   PRICE    QUANTITY" << std::endl;
+    std::cout << "         BIDS                    ASKS" << std::endl;
+    std::cout << " VOLUME        PRICE    PRICE           VOLUME" << std::endl;
 
-  size_t maxSize = std::max(m_orderBook.bidSize(), m_orderBook.askSize());
-  const auto& bids = m_orderBook.getBids();
-  const auto& asks = m_orderBook.getAsks();
+    // Display only the first 10 rows of the order book.
+    size_t maxSize = 10;
 
-  auto bidIt = bids.begin();
-  auto askIt = asks.begin();
+    // In order to prevent reading the bids and asks sets whilst they are being modified, create
+    // deepcopies and display them.
+    std::multiset<std::unique_ptr<Order>, DecreasingPriceComparator> deepCopyBids;
+    std::multiset<std::unique_ptr<Order>, IncreasingPriceComparator> deepCopyAsks;
 
-  for (size_t i = 0; i < maxSize; ++i) {
-    std::cout << "[";
-
-    if (bidIt != bids.end()) {
-      std::cout << (*bidIt)->getQuantity() << std::string(7, ' ') << "-" << std::string(2, ' ')
-                << (*bidIt)->getPrice();
-      ++bidIt;
-    } else {
-      std::cout << std::string(17, ' ');
+    for (const auto& originalPtr : m_orderBook.bids()) {
+      // Create a deep copy of the Order object and its associated unique_ptr.
+      std::unique_ptr<Order> newCopy(new Order(*originalPtr));
+      deepCopyBids.insert(std::move(newCopy));
     }
 
-    std::cout << " | ";
-
-    if (askIt != asks.end()) {
-      std::cout << (*askIt)->getPrice() << std::string(2, ' ') << "-" << std::string(7, ' ')
-                << (*askIt)->getQuantity();
-      ++askIt;
-    } else {
-      std::cout << std::string(17, ' ');
+    for (const auto& originalPtr : m_orderBook.asks()) {
+      // Create a deep copy of the Order object and its associated unique_ptr.
+      std::unique_ptr<Order> newCopy(new Order(*originalPtr));
+      deepCopyAsks.insert(std::move(newCopy));
     }
 
-    std::cout << "]" << std::endl;
+    auto bidIt = deepCopyBids.begin();
+    auto askIt = deepCopyAsks.begin();
+
+    for (size_t i = 0; i < maxSize; ++i) {
+      std::cout << "[";
+
+      if (bidIt != deepCopyBids.end()) {
+        // TODO: vary the number of spaces depending on the length of the price and volume strings.
+        std::cout << (*bidIt)->volume() << std::string(7, ' ') << "-" << std::string(2, ' ')
+                  << (*bidIt)->price();
+        ++bidIt;
+      } else {
+        std::cout << std::string(17, ' ');
+      }
+
+      std::cout << " | ";
+
+      if (askIt != deepCopyAsks.end()) {
+        std::cout << (*askIt)->price() << std::string(2, ' ') << "-" << std::string(7, ' ')
+                  << (*askIt)->volume();
+        ++askIt;
+      } else {
+        std::cout << std::string(17, ' ');
+      }
+
+      std::cout << "]" << std::endl;
+    }
   }
 };
